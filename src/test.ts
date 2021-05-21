@@ -21,16 +21,16 @@ dispatcher.register("a",new Action((event)=>{
 }));
 dispatcher.register("1",new Action((event)=>{
     console.log(event);
-    return `What is Your Name`;
+    return `CON What is Your Name`;
 }));
 dispatcher.register("1*<name:string>",new Action((event)=>{
     console.log(event);
-    return `What is Your Email`;
+    return `CON What is Your Email`;
 }));
 dispatcher.register("1*<name:string>*<email:string>",new Action((event)=>{
     console.log(event);
     return [
-        `YOUR PROFILE HAVE BEEN CREATED`,
+        `END YOUR PROFILE HAS BEEN CREATED`,
     `NAME:${event.params.name}`,
     `EMAIL:${event.params.email}`
 ];
@@ -38,14 +38,14 @@ dispatcher.register("1*<name:string>*<email:string>",new Action((event)=>{
 dispatcher.register("2",new Action((event)=>{
     console.log(event);
     return [
-        `WELCOME TO YOUR HELP PAGE`,
+        `CON WELCOME TO YOUR HELP PAGE`,
     `PELASE ENTER YOUR USERNAME:`
     ];
 }));
 dispatcher.register("2*:user",new Action((event)=>{
     console.log(event);
     return [
-        `YOUR  USERNAME IS`,
+        `END YOUR USERNAME IS`,
     `${event.params.user}`
     ];
 }));
