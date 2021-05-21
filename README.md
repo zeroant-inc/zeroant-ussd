@@ -69,7 +69,7 @@ THE JS WEAPON
     }));
 
     dispatcher.on('request',(req:Request)=>{
-        // push data to event trought (query|body).content
+        // push data to event through (query|body).content
         const user = {
             action: "1*Michael",
             remember: false
