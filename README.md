@@ -4,13 +4,13 @@ THE JS WEAPON
 
 # sample
 
-<pre>
-    import express from "express";
-    import { expressDispatcher, Action, Dispatcher } from "zeroant-ussd";
-    const app = express();
-    const dispatcher = new Dispatcher({
-        delimiter:"*"
-    });
+&lt;pre>
+import express from "express";
+import { expressDispatcher, Action, Dispatcher } from "zeroant-ussd";
+const app = express();
+const dispatcher = new Dispatcher({
+delimiter:"\*"
+});
 
     dispatcher.register("",new Action((event)=>{
         console.log(event);
@@ -75,7 +75,7 @@ THE JS WEAPON
             remember: false
         };
          /**
-            *  req.params.action = req.body.text as string; 
+            *  req.params.action = req.body.text as string;
             *  or
             *  req.params.action = req.query.text as string;
             *  not that the req.(query|body)[your action] can be any keyword
@@ -96,17 +96,18 @@ THE JS WEAPON
     app.listen(process.env.PORT || 3000,()=>{
         console.log(`Application listening on port ${process.env.PORT || 3000}`);
     })
-</pre>
+
+&lt;/pre>
 
 # Using event.con and event.end
 
-<pre>
-    import express from "express";
-    import { expressDispatcher, Action, Dispatcher } from "zeroant-ussd";
-    const app = express();
-    const dispatcher = new Dispatcher({
-        delimiter:"*"
-    });
+&lt;pre>
+import express from "express";
+import { expressDispatcher, Action, Dispatcher } from "zeroant-ussd";
+const app = express();
+const dispatcher = new Dispatcher({
+delimiter:"\*"
+});
 
     dispatcher.register("",new Action((event)=>{
         console.log(event);
@@ -125,16 +126,16 @@ THE JS WEAPON
         console.log(event);
         return event.con(`What is Your Name`);
     }));
-    dispatcher.register("1*<name:integer>",new Action((event)=>{
+    dispatcher.register("1*&lt;name:intege&gt;",new Action((event)=>{
         console.log(event);
         return event.end(`You have entered an invalid name`);
     }));
-    dispatcher.register("1*<name:string>",new Action((event)=>{
+    dispatcher.register("1*&lt;name:strin&gt;",new Action((event)=>{
         console.log(event);
         return event.con(`What is Your Email`);
     }));
 
-    dispatcher.register("1*<name:string>*<email:string>",new Action((event)=>{
+    dispatcher.register("1*&lt;name:strin&gt;*&lt;email:strin&gt;",new Action((event)=>{
         console.log(event);
         return event.end(
             `YOUR PROFILE HAS BEEN CREATED`,
@@ -167,7 +168,7 @@ THE JS WEAPON
             remember: false
         };
         /**
-        *  req.params.action = req.body.text as string; 
+        *  req.params.action = req.body.text as string;
         *  or
         *  req.params.action = req.query.text as string;
         *  not that the req.(query|body)[your action] can be any keyword
@@ -189,4 +190,5 @@ THE JS WEAPON
     app.listen(process.env.PORT || 3000,()=>{
         console.log(`Application listening on port ${process.env.PORT || 3000}`);
     })
-</pre>
+
+&lt;/pre>
