@@ -66,7 +66,7 @@ dispatcher.on('request',(req:Request)=>{
         action: "1*Michael",
         remember: false
     };
-    // remeber to save to session wile using remeber me
+    // remember to save to session while using remember me
     if(user.remember){
         req.query.action = user.action;
         req.query.content = user as any;
