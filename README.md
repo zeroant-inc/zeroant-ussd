@@ -9,7 +9,7 @@ THE JS WEAPON
     import { expressDispatcher , Action, Dispatcher} from "zeroant-ussd";
     const app = express();
     const dispatcher = new Dispatcher({
-        delimiter:"\*"
+        delimiter:"*"
     });
 
     dispatcher.register("",new Action((event)=>{
