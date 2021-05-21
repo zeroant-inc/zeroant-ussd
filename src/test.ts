@@ -61,23 +61,25 @@ dispatcher.register("(.?)",new Action((event)=>{
 }));
 
 dispatcher.on('request',(req:Request)=>{
-    // push data to event through (query|body).content
+    // push data to event through (params|query|body).content
     const user = {
         action: "1*Michael",
         remember: false
     };
+    req.params.action = req.body.text;
     // remember to save to session while using remember me
     if(user.remember){
-        req.query.action = user.action;
-        req.query.content = user as any;
+        req.params.action = user.action;
+        req.params.content = user as any;
     }
+   
 });
 dispatcher.on('response',(data:any)=>{
     // transform data to match ussd provider
     console.log({data});
     return data;
 });
-app.use(expressDispatcher(dispatcher));
+app.use(expressDispatcher(dispatcher,"params"));
 app.listen(process.env.PORT || 3000,()=>{
     console.log(`Application listening on port ${process.env.PORT || 3000}`);
 })
