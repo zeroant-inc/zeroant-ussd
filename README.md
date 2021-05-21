@@ -29,7 +29,7 @@ THE JS WEAPON
         console.log(event);
         return `What is Your Name`;
     }));
-    dispatcher.register("1*&gt;name:string&lt;",new Action((event)=>{
+    dispatcher.register("1*&lt;name:string&gt;",new Action((event)=>{
         console.log(event);
         return `What is Your Email`;
     }));
