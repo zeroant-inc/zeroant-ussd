@@ -1,10 +1,20 @@
 import express from "express";
-import {Action, Dispatcher} from "."
+import { expressDispatcher } from "./express";
+import {Action, Dispatcher} from "./event"
 const app = express();
 const dispatcher = new Dispatcher({
     delimiter:"*"
 });
 
+dispatcher.register("",new Action((event)=>{
+    console.log(event);
+    // default fall back
+    return [
+        `CON WELCOME TO USSD TEST FRAMEWORK`,
+        `1 SIGNUP`,
+        "2 HELP"
+    ];
+}));
 dispatcher.register("a",new Action((event)=>{
  console.log(event);
  return "END i was here";
@@ -27,18 +37,10 @@ dispatcher.register("1*<name:string>*<email:string>",new Action((event)=>{
 }));
 dispatcher.register("(.?)",new Action((event)=>{
     console.log(event);
-    return [
-        `CON WELCOME TO USSD TEST FRAMEWORK`,
-        `1 SIGNUP`
-    ];
+    // default fall back
+    return [`END THANK YOU FOR USING USSD TEST FRAMEWORK`];
 }));
-app.use((req,res)=>{
-    const result =dispatcher.run(req.query.action as string, req.query.content as string);
-    if(Array.isArray(result)){
-        return res.send(result.join("\n"));
-    }
-    res.send(result);
-});
+app.use(expressDispatcher(dispatcher));
 app.listen(process.env.PORT || 3000,()=>{
     console.log(`Application listening on port ${process.env.PORT || 3000}`);
 })
