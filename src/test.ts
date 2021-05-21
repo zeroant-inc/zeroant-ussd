@@ -35,6 +35,20 @@ dispatcher.register("1*<name:string>*<email:string>",new Action((event)=>{
     `EMAIL:${event.params.email}`
 ];
 }));
+dispatcher.register("2",new Action((event)=>{
+    console.log(event);
+    return [
+        `WELCOME TO YOUR HELP PAGE`,
+    `PELASE ENTER YOUR USERNAME:`
+    ];
+}));
+dispatcher.register("2*:user",new Action((event)=>{
+    console.log(event);
+    return [
+        `YOUR  USERNAME IS`,
+    `${event.params.user}`
+    ];
+}));
 dispatcher.register("(.?)",new Action((event)=>{
     console.log(event);
     // default fall back
