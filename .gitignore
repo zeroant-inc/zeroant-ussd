@@ -1,0 +1,10 @@
+node_modules
+dist
+lib
+/bin
+logs
+application
+*.env
+.DS_Store
+*.gql
+/coverage
