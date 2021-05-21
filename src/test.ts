@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request } from "express";
 import { expressDispatcher } from "./express";
 import {Action, Dispatcher} from "./event"
 const app = express();
