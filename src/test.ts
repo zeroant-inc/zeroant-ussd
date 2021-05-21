@@ -9,52 +9,50 @@ const dispatcher = new Dispatcher({
 dispatcher.register("",new Action((event)=>{
     console.log(event);
     // default fall back
-    return [
-        `CON WELCOME TO USSD TEST FRAMEWORK`,
+    return event.con(
+        `WELCOME TO USSD TEST FRAMEWORK`,
         `1 SIGNUP`,
         "2 HELP"
-    ];
+    );
 }));
 dispatcher.register("a",new Action((event)=>{
  console.log(event);
- return "END i was here";
+ return event.end("i was here");
 }));
 dispatcher.register("1",new Action((event)=>{
     console.log(event);
-    return `CON What is Your Name`;
+    return event.con(`What is Your Name`);
+}));
+dispatcher.register("1*<name:integer>",new Action((event)=>{
+    console.log(event);
+    return event.end(`You have entered an invalid name`);
 }));
 dispatcher.register("1*<name:string>",new Action((event)=>{
     console.log(event);
-    return `CON What is Your Email`;
+    return event.con(`What is Your Email`);
 }));
+
 dispatcher.register("1*<name:string>*<email:string>",new Action((event)=>{
     console.log(event);
-    return [
-        `END YOUR PROFILE HAS BEEN CREATED`,
-    `NAME:${event.params.name}`,
-    `EMAIL:${event.params.email}`
-];
+    return event.end(
+        `YOUR PROFILE HAS BEEN CREATED`,
+        `NAME:${event.params.name}`,
+        `EMAIL:${event.params.email}`);
 }));
 dispatcher.register("2",new Action((event)=>{
     console.log(event);
-    return [
-        `CON WELCOME TO YOUR HELP PAGE`,
-    `PELASE ENTER YOUR USERNAME:`
-    ];
+    return event.con(`WELCOME TO YOUR HELP PAGE`,`PELASE ENTER YOUR USERNAME:`);
 }));
 dispatcher.register("2*:user",new Action((event)=>{
     console.log(event);
-    return [
-        `END YOUR USERNAME IS`,
-    `${event.params.user}`
-    ];
+    return event.end(`YOUR USERNAME IS`, `${event.params.user}`);
 }));
 dispatcher.register("(.?)",new Action((event)=>{
-    return [`END THANK YOU FOR USING USSD TEST FRAMEWORK`];
+    return event.end(`THANK YOU FOR USING USSD TEST FRAMEWORK`);
 }).on('before',(event)=>{
     console.log("Event BEFORE START");
     if(event.data){
-        return [`END AN ERROR OCCURE WHILE TRYING TO COMPLETE YOUR REQUEST`]
+        return event.end(`AN ERROR OCCURE WHILE TRYING TO COMPLETE YOUR REQUEST`);
     }
 }).on('after',(event)=>{
     console.log(event,"Event Ended");

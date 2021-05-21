@@ -30,7 +30,7 @@ class EventHandler{
                 this.event.params[action.substr(1)] = event;
             }
             else if(action.startsWith('<') && action.endsWith(">")){
-                const [key,type,fallback=""] =  action.substr(1).substring(-1).split(":");
+                const [key,type,fallback] =  action.substr(1,action.length-2).split(":");
                 if(!key || !type){
                     throw new EventError(`action.startsWith < must contain a key with a valid format of <key:value> or <key:value:default>\n default are using incase of empty string like ""  example <id:string> or <id:string:2>`);
                 }
@@ -39,12 +39,36 @@ class EventHandler{
                 }else{
                     this.event.params[key] = this.valueParser(event,type);
                 } 
+                if(!this.validType(key,type)){
+                    return false;
+                }
             }
             else if(action !==event){
                 return false; 
             }  
         }
         return true; 
+    }
+    validType(key:string,keyType:string){
+        const type = this.typeParser(keyType);
+        if( typeof this.event.params[key]!==type){
+            return false; 
+        }
+        if(type==="number" && Number.isNaN(this.event.params[key])){
+            return false;
+        }
+        return true;
+    }
+    typeParser(type:string){
+        switch(type){
+            case "number":
+            case "float":
+            case "integer":
+                return "number";
+            case "string":
+            default:
+                return "string";
+        } 
     }
     valueParser(value:string,type:string){
         switch(type){
@@ -53,9 +77,9 @@ class EventHandler{
             case "number":
                 return Number(value);
             case "float":
-                return parseFloat(value);
+                return parseFloat(Number(value).toString());
             case "integer":
-                return parseInt(value);
+                return parseInt(Number(value).toString());
             default:
                 return value;
         }
@@ -121,6 +145,18 @@ class Event{
     data:string|Record<string,any> = {}; 
     get name(){
        return this.events.join(this.delimiter);
+    }
+    con(arg:string|Record<string,any>,...args:string[]):Record<string,any>|string[]{
+        if(typeof arg ==="string"){
+            return  ["CON ".concat(arg), ...args];
+        }
+        return args;
+    }
+    end(arg:string|Record<string,any>,...args:string[]):Record<string,any>|string[]{
+        if(typeof arg ==="string"){
+            return  ["END ".concat(arg), ...args];
+        }
+        return arg;
     }
 }
 
