@@ -50,9 +50,14 @@ dispatcher.register("2*:user",new Action((event)=>{
     ];
 }));
 dispatcher.register("(.?)",new Action((event)=>{
-    console.log(event);
-    // default fall back
     return [`END THANK YOU FOR USING USSD TEST FRAMEWORK`];
+}).on('before',(event)=>{
+    console.log("Event BEFORE START");
+    if(event.data){
+        return [`END AN ERROR OCCURE WHILE TRYING TO COMPLETE YOUR REQUEST`]
+    }
+}).on('after',(event)=>{
+    console.log(event,"Event Ended");
 }));
 app.use(expressDispatcher(dispatcher));
 app.listen(process.env.PORT || 3000,()=>{

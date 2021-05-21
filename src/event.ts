@@ -108,9 +108,25 @@ class Event{
 }
 
 export class Action{
+    private listener: Record<'before'|'after', ActionHandler|AsyncActionHandler> = {
+        'before': ()=>{},
+        'after': ()=>{} 
+    };
     constructor(public handler:ActionHandler|AsyncActionHandler){
     }
+    on(type:'before'|'after',handler:ActionHandler|AsyncActionHandler|undefined|null){
+        if(handler===undefined || handler==null){
+           this.listener[type]=()=>{};
+           return this;
+        }
+        this.listener[type]=handler;
+        return this;
+    }
     run<T>(event:Event){
-       return this.handler(event) as T;
+        let result = this.listener.before(event) as T;
+        if(result !==undefined)return result;
+        result = this.handler(event) as T;
+        this.listener.after(event);
+        return result;    
     }
 }
