@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Dispatcher } from "./event";
 
-export const expressDispatcher = (dispatcher:Dispatcher,source:"query"|"body"="query") => async (req:Request,res:Response) =>{
+export const expressDispatcher = (dispatcher:Dispatcher,source:"query"|"body"|"params"="params") => async (req:Request,res:Response) =>{
     const listeners = dispatcher.listener;
     if(listeners.request) await listeners.request(req);
     let result =await dispatcher.run(req[source].action as string, req[source].content);
