@@ -66,13 +66,19 @@ dispatcher.on('request',(req:Request)=>{
         action: "1*Michael",
         remember: false
     };
-    req.params.action = req.body.text;
+    /**
+     *  req.params.action = req.body.text as string; 
+     *  or
+     *  req.params.action = req.query.text as string;
+     *  not that the req.(query|body)[your action] can be any keyword
+     */
+    req.params.action = req.query.text as string;
     // remember to save to session while using remember me
     if(user.remember){
         req.params.action = user.action;
         req.params.content = user as any;
     }
-   
+
 });
 dispatcher.on('response',(data:any)=>{
     // transform data to match ussd provider
