@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { expressDispatcher } from "./express";
 import {Action, Dispatcher} from "./event"
 const app = express();
@@ -59,6 +59,24 @@ dispatcher.register("(.?)",new Action((event)=>{
 }).on('after',(event)=>{
     console.log(event,"Event Ended");
 }));
+
+dispatcher.on('request',(req:Request)=>{
+    // push data to event trought (query|body).content
+    const user = {
+        action: "1*Michael",
+        remember: false
+    };
+    // remeber to save to session wile using remeber me
+    if(user.remember){
+        req.query.action = user.action;
+        req.query.content = user as any;
+    }
+});
+dispatcher.on('response',(data:any)=>{
+    // transform data to match ussd provider
+    console.log({data});
+    return data;
+});
 app.use(expressDispatcher(dispatcher));
 app.listen(process.env.PORT || 3000,()=>{
     console.log(`Application listening on port ${process.env.PORT || 3000}`);

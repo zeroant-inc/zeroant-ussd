@@ -1,4 +1,3 @@
-
 type ActionHandler = (event:Event)=>any;
 type  AsyncActionHandler = (event:Event)=>any;
 class  EventError extends Error{
@@ -65,9 +64,13 @@ class EventHandler{
 export interface DispatcherOptions{
     delimiter?:string;
 }
+type DispatcherOnReq = (req:any)=>unknown;
+type DispatcherOnRes = (data:any)=>unknown;
 export class Dispatcher{
     private registry = new Map<string,Action>();
     private delimiter = "*";
+    private listener_request?: DispatcherOnReq;
+    private listener_response?: DispatcherOnRes;
     constructor(options:DispatcherOptions = {}){
      this.init(options);
     }
@@ -76,11 +79,25 @@ export class Dispatcher{
             this.delimiter=options.delimiter;
         }
     }
-  
+    get listener(){
+        return {
+            request:this.listener_request,
+            response:this.listener_response,
+        }
+    }
+    on(type:'request'|'response',handler:DispatcherOnReq|DispatcherOnRes){
+        if(type ==='request' ){
+            this.listener_request=handler as DispatcherOnReq;
+        }
+        if(type ==='response'){
+            this.listener_response=handler as DispatcherOnRes; 
+        }
+        return this;
+    }
     register(name:string,action:Action){
         this.registry.set(name,action);
     }
-    run<T>(event:string,data:string|Record<any,any>){
+    async run<T>(event:string,data:string|Record<any,any>):Promise<T>{
         if(event === undefined){
            throw new EventError("Event can't be empty");
         }
@@ -92,7 +109,7 @@ export class Dispatcher{
             if(eventHandler.isValid()){
                 const actionHandler = this.registry.get(action) as Action;
                 eventHandler.event.data = data;
-                return actionHandler.run<T>(eventHandler.event)
+                return await actionHandler.run<Promise<T>>(eventHandler.event)
             }
         } 
         throw new EventError("No action found for this event"); 
@@ -122,11 +139,11 @@ export class Action{
         this.listener[type]=handler;
         return this;
     }
-    run<T>(event:Event){
-        let result = this.listener.before(event) as T;
+    async run<T>(event:Event):Promise<T>{
+        let result = await this.listener.before(event) as T;
         if(result !==undefined)return result;
-        result = this.handler(event) as T;
-        this.listener.after(event);
+        result = await this.handler(event) as T;
+        await this.listener.after(event);
         return result;    
     }
 }
