@@ -45,8 +45,20 @@ dispatcher.register("2",new Action((event)=>{
 }));
 dispatcher.register("2*:user",new Action((event)=>{
     console.log(event);
-    return event.end(`YOUR USERNAME IS`, `${event.params.user}`);
+    return event.con(`YOUR USERNAME IS`, `${event.params.user}`);
 }));
+dispatcher.register(
+    "2*:user*(.?)",
+    new Action((event) => {
+      console.log(event);
+      return event.con(
+        `YOUR USERNAME IS`,
+        `${event.params.user} => ${event.name}`,
+        `last input => ${event.events[event.events.length-1]}`
+
+      );
+    })
+  );
 dispatcher.register("(.?)",new Action((event)=>{
     return event.end(`THANK YOU FOR USING USSD TEST FRAMEWORK`);
 }).on('before',(event)=>{

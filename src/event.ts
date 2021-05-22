@@ -10,21 +10,19 @@ class EventHandler{
     }
     isValid(){
         const actions = this.action.split(this.explode);
-        if(actions.indexOf('(.?)')===0){
-            return true; 
-        }
-        if(this.events.length !== actions.length){
-            return false;
-        }
+        const eventsNotEqAction = this.events.length !== actions.length;
+        const allowAction = actions.indexOf('(.?)')!==-1;
         for(let i=0;i<actions.length ;i++){
             const action = actions[i];
-            const event =  this.events[i];
-           
+            const event = this.events[i];
+            if(action==='(.?)'){
+                return true; 
+            }
             if(typeof event === "undefined"){
                 return false;
             }
-            else if(event==='(.?)'){
-                return true; 
+            if(eventsNotEqAction && !allowAction){
+                return false;
             }
             else if(action.startsWith("(") && action.endsWith(')') && !(new RegExp(action).test(event))){
                 return false; 
