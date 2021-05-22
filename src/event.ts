@@ -10,7 +10,7 @@ class EventHandler{
     }
     isValid(){
         const actions = this.action.split(this.explode);
-        if(actions.indexOf('(.?)')!==-1){
+        if(actions.indexOf('(.?)')===0){
             return true; 
         }
         if(this.events.length !== actions.length){
@@ -19,9 +19,12 @@ class EventHandler{
         for(let i=0;i<actions.length ;i++){
             const action = actions[i];
             const event =  this.events[i];
-
+           
             if(typeof event === "undefined"){
                 return false;
+            }
+            else if(event==='(.?)'){
+                return true; 
             }
             else if(action.startsWith("(") && action.endsWith(')') && !(new RegExp(action).test(event))){
                 return false; 
@@ -89,7 +92,11 @@ export interface DispatcherOptions{
     delimiter?:string;
 }
 type DispatcherOnReq = (req:any)=>unknown;
-type DispatcherOnRes = (data:any)=>unknown;
+type DispatcherOnRes = <T=unknown>(data:EventText|EventPayload)=>Promise<T>;
+export interface Dispatcher{
+    on(type:'request',handler:DispatcherOnReq):Dispatcher;
+    on(type:'response',handler:DispatcherOnRes):Dispatcher;
+}
 export class Dispatcher{
     private registry = new Map<string,Action>();
     private delimiter = "*";
@@ -121,7 +128,7 @@ export class Dispatcher{
     register(name:string,action:Action){
         this.registry.set(name,action);
     }
-    async run<T>(event:string,data:string|Record<any,any>):Promise<T>{
+    async run<T=unknown>(event:string,data:string|Record<any,any>):Promise<T>{
         if(event === undefined){
            throw new EventError("Event can't be empty");
         }
@@ -129,15 +136,30 @@ export class Dispatcher{
         const events = event.split(this.delimiter);
         for (const action of actions){
             const eventHandler =  new EventHandler(events,action, this.delimiter);
-            // event.
             if(eventHandler.isValid()){
                 const actionHandler = this.registry.get(action) as Action;
                 eventHandler.event.data = data;
-                return await actionHandler.run<Promise<T>>(eventHandler.event)
+                let result = await actionHandler.run<Promise<T>>(eventHandler.event)
+                if(Array.isArray(result)){
+                    result = result.join("\n") as unknown as T;
+                }
+                if(typeof result ==="string"){
+                    result = new EventText(result) as unknown as T;
+                }
+                if(this.listener_response) {
+                    result = await this.listener_response(result as any);
+                }
+                return result;
             }
         } 
         throw new EventError("No action found for this event"); 
     }
+}
+interface Event{
+    con(arg:string,...args:string[]):string[];
+    con(arg:Record<string,any>):EventPayload;
+    end(arg:string,...args:string[]):string[];
+    end(arg:Record<string,any>):EventPayload;
 }
 class Event{
     constructor(public events: string[],public delimiter:string){}
@@ -146,17 +168,17 @@ class Event{
     get name(){
        return this.events.join(this.delimiter);
     }
-    con(arg:string|Record<string,any>,...args:string[]):Record<string,any>|string[]{
+    con(arg:string|Record<string,any>,...args:string[]):string[]|Record<string,any>{
         if(typeof arg ==="string"){
             return  ["CON ".concat(arg), ...args];
         }
-        return args;
+        return new EventPayload("CON",arg);
     }
-    end(arg:string|Record<string,any>,...args:string[]):Record<string,any>|string[]{
+    end(arg:string|Record<string,any>,...args:string[]):string[]|Record<string,any>{
         if(typeof arg ==="string"){
             return  ["END ".concat(arg), ...args];
         }
-        return arg;
+        return new EventPayload("END",arg);
     }
 }
 
@@ -181,5 +203,47 @@ export class Action{
         result = await this.handler(event) as T;
         await this.listener.after(event);
         return result;    
+    }
+}
+export interface  EventText{
+    type:string;
+}
+export class EventText extends String{
+    constructor(value:any){
+        super(value);
+        const type = this.substr(0,3).trim();
+        Object.defineProperty(this,'type',{
+            get:function(){
+                return type;
+            }
+        })
+    }
+    get isCon(){
+        return this.type==="CON";
+    }
+    get isEnd(){
+        return this.type==="END";
+    }
+    get text(){
+        return this.substr(3);
+    }
+}
+export interface EventPayload{
+    type:string;
+}
+export class EventPayload{
+    constructor( type:"CON"|"END",payload:Record<string,any>){
+       Object.assign(this,payload);
+       Object.defineProperty(this,'type',{
+           get:function(){
+               return type;
+           }
+       });
+    }
+    get isCon(){
+        return this.type==="CON";
+    }
+    get isEnd(){
+        return this.type==="END";
     }
 }

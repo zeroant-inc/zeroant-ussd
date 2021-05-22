@@ -1,6 +1,6 @@
 import express, { Request } from "express";
 import { expressDispatcher } from "./express";
-import {Action, Dispatcher} from "./event"
+import { Action, Dispatcher, EventPayload, EventText } from "./event"
 const app = express();
 const dispatcher = new Dispatcher({
     delimiter:"*"
@@ -70,7 +70,7 @@ dispatcher.on('request',(req:Request)=>{
      *  req.params.action = req.query.text as string;
      *  not that the req.(query|body)[your action] can be any keyword
      */
-    req.params.action = req.query.text as string;
+    req.params.action = req.query.text as string || '';
     // remember to save to session while using remember me
     if(user.remember){
         req.params.action = user.action;
@@ -78,10 +78,12 @@ dispatcher.on('request',(req:Request)=>{
     }
 
 });
-dispatcher.on('response',(data:any)=>{
+dispatcher.on('response',(data)=>{
     // transform data to match ussd provider
-    console.log({data});
+    // for smmp
+    console.log({data, type:data.type})   
     return data;
+    
 });
 app.use(expressDispatcher(dispatcher,"params"));
 app.listen(process.env.PORT || 3000,()=>{

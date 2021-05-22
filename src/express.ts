@@ -1,16 +1,12 @@
 import { Request, Response } from "express";
-import { Dispatcher } from "./event";
+import { Dispatcher, EventPayload, EventText } from "./event";
 
 export const expressDispatcher = (dispatcher:Dispatcher,source:"query"|"body"|"params"="params") => async (req:Request,res:Response) =>{
-    const listeners = dispatcher.listener;
-    if(listeners.request) await listeners.request(req);
-    let result =await dispatcher.run(req[source].action as string, req[source].content);
-    if(Array.isArray(result)){
-        result = result.join("\n");
+    const listeners = dispatcher.listener.request;
+    if(listeners) await listeners(req);
+    let result = await dispatcher.run<EventText|EventPayload>(req[source].action as string, req[source].content);
+    if(result instanceof EventText){ 
+       return res.send(result.toString());
     }
-    if(listeners.response) result = await listeners.response(result);
-    if(typeof result!=="string"){
-        res.json(result);
-    }
-    res.send(result);
+    res.send(result);  
 }
