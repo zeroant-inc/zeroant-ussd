@@ -1,6 +1,6 @@
 import express, { Request } from "express";
 import { expressDispatcher } from "./express";
-import { Action, Dispatcher, EventPayload, EventText } from "./event"
+import { Action, Dispatcher } from "./event"
 const app = express();
 const dispatcher = new Dispatcher({
     delimiter:"*"
