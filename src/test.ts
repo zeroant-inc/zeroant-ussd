@@ -69,12 +69,12 @@ dispatcher.register("(.?)",new Action((event)=>{
 }).on('after',(event)=>{
     console.log(event,"Event Ended");
 }));
-
 dispatcher.on('request',(req:Request)=>{
     // push data to event through (params|query|body).content
     const user = {
         action: "1*Michael",
-        remember: false
+        remember: false,
+        msisdn:req.query.msisdn
     };
     /**
      *  req.params.action = req.body.text as string; 
@@ -86,16 +86,15 @@ dispatcher.on('request',(req:Request)=>{
     // remember to save to session while using remember me
     if(user.remember){
         req.params.action = user.action;
-        req.params.content = user as any;
     }
-
-});
-dispatcher.on('response',(data)=>{
-    // transform data to match ussd provider
-    // for smmp
-    console.log({data, type:data.type})   
-    return data;
+    req.params.content = user as any;
     
+});
+
+dispatcher.on('response',(data:any)=>{
+    // transform data to match ussd provider
+    console.log({data});
+    return data;
 });
 app.use(expressDispatcher(dispatcher,"params"));
 app.listen(process.env.PORT || 3000,()=>{

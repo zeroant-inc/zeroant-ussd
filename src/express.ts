@@ -8,5 +8,6 @@ export const expressDispatcher = (dispatcher:Dispatcher,source:"query"|"body"|"p
     if(result instanceof EventText){ 
        return res.send(result.toString());
     }
-    res.send(result);  
+    res.setHeader("Content-Type",result.contentType)
+    res.send(result.payload);  
 }

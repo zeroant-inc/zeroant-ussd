@@ -1,6 +1,6 @@
 {
 	"name": "zeroant-ussd",
-	"version": "0.0.13",
+	"version": "0.0.13-rc0",
 	"description": "ussd dispatcher",
 	"main": "lib/index.js",
 	"scripts": {
