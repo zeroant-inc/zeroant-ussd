@@ -241,12 +241,12 @@ export interface EventPayload{
 }
 export class EventPayload{
     constructor( type:"CON"|"END",payload:Record<string,any>|string,contentType?:string){
-       Object.defineProperty(this,'type',{
-           get:function(){
-               return type;
-           }
-       });
-       Object.defineProperty(this,'payload',{
+        Object.defineProperty(this,'type',{
+            get:function(){
+                return type;
+            }
+        });
+        Object.defineProperty(this,'payload',{
             get:function(){
                 return payload;
             }
