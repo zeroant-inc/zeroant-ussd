@@ -212,7 +212,7 @@ export class Action{
     }
 }
 export interface  EventText{
-    type:"CON"|"END";
+    get type():"CON"|"END";
 }
 export class EventText extends String{
     constructor(value:any){
@@ -235,9 +235,9 @@ export class EventText extends String{
     }
 }
 export interface EventPayload{
-    type:"CON"|"END";
-    contentType:string;
-    payload:any;
+    get type():"CON"|"END";
+    get contentType():string;
+    get payload():any;
 }
 export class EventPayload{
     constructor( type:"CON"|"END",payload:Record<string,any>|string,contentType?:string){
@@ -247,21 +247,20 @@ export class EventPayload{
            }
        });
        Object.defineProperty(this,'payload',{
-        get:function(){
-            return payload;
-        }
-    });
-    
-    Object.defineProperty(this,'contentType',{
-        get:function(){
-            if(contentType)return contentType;
-            if(typeof payload === "string"){
-                return "text/pain";
+            get:function(){
+                return payload;
             }
-            return  "application/json";
-        }
-    });
-   
+        });
+        
+        Object.defineProperty(this,'contentType',{
+            get:function(){
+                if(contentType)return contentType;
+                if(typeof payload === "string"){
+                    return "text/pain";
+                }
+                return  "application/json";
+            }
+        });
     }
     get isCon(){
         return this.type==="CON";
